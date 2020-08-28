@@ -2,6 +2,19 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <Authors>Disper</Authors>
+    <Company>Disper</Company>
+    <Product>AutoMessage</Product>
+    <Description>An ultra-fast expression-based binary serializer/deserializer using pre-emitted serializers/deserializers with support for transmitting types even if they do not exist on the other assembly.</Description>
+    <Copyright>Copyright 2020 Disper</Copyright>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/usertoroot/AutoMessage</PackageProjectUrl>
+    <PackageIcon>automessage.jpg</PackageIcon>
+    <RepositoryUrl>https://github.com/usertoroot/AutoMessage</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <PackageTags>utility serializer serialization deserializer deserialization binary parser reader writer emit expression netstandard standard</PackageTags>
+    <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -15,6 +28,17 @@
   <ItemGroup>
     <PackageReference Include="System.Memory" Version="4.5.4" />
     <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="automessage.jpg">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
