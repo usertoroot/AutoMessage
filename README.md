@@ -18,7 +18,7 @@ public class TestDependency
 
 public class Test
 {
-    public int[] TestIntArary { get; set; }
+    public int[] TestIntArray { get; set; }
     public TestDependency[] TestDependency1;
     public List<TestDependency> TestDependency3;
     public TestDependency TestDependency2;
@@ -31,8 +31,7 @@ public class Test
 ## Simplest serialization
 
 ```C#
-var d = MessageSerializer.Serialize(t);
-}
+var data = MessageSerializer.Serialize(hello);
 ```
 
 ## Preallocated arrays serialization
