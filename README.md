@@ -38,18 +38,18 @@ var d = MessageSerializer.Serialize(t);
 ## Preallocated arrays serialization
 
 ```C#
-var size = MessageSerializer.GetSize(t);
+var size = MessageSerializer.GetSize(hello);
 var d = new byte[size];
 
 using (Stream stream = new MemoryStream(d))
 using (BinaryWriter writer = new BinaryWriter(stream, Encoding.UTF8, true))
 {
-    MessageSerializer.Serialize(writer, t);
+    MessageSerializer.Serialize(writer, hello);
 }
 ```
 
 ## Simplest deserialization
 
 ```C#
-var t = MessageDeserializer.Deserialize<Hello>();
+var hello = MessageDeserializer.Deserialize<Hello>();
 ```
