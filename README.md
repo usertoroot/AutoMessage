@@ -31,8 +31,7 @@ public class Test
 ## Simplest serialization
 
 ```C#
-var d = MessageSerializer.Serialize(t);
-}
+var data = MessageSerializer.Serialize(hello);
 ```
 
 ## Preallocated arrays serialization
