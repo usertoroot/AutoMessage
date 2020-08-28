@@ -1,6 +1,6 @@
 # AutoMessage
 
-An ultra-fast expression-based binary serializer/deserializer with support for transmitting types even if they do not exist on the other assembly.
+An ultra-fast expression-based binary serializer/deserializer using pre-emitted serializers/deserializers with support for transmitting types even if they do not exist on the other assembly.
 
 # Examples
 
