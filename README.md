@@ -18,7 +18,7 @@ public class TestDependency
 
 public class Test
 {
-    public int[] TestIntArary { get; set; }
+    public int[] TestIntArray { get; set; }
     public TestDependency[] TestDependency1;
     public List<TestDependency> TestDependency3;
     public TestDependency TestDependency2;
