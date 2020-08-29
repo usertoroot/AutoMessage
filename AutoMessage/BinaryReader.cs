@@ -20,7 +20,6 @@ namespace AutoMessage
         }
 
         public bool[] ReadBooleans(int count) => ReadPrimitiveArray<bool>(count);
-        public decimal[] ReadDecimals(int count) => ReadPrimitiveArray<decimal>(count);
         public double[] ReadDoubles(int count) => ReadPrimitiveArray<double>(count);
         public short[] ReadInt16s(int count) => ReadPrimitiveArray<short>(count);
         public int[] ReadInt32s(int count) => ReadPrimitiveArray<int>(count);

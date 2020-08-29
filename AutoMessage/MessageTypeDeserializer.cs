@@ -1,5 +1,8 @@
-﻿using System;
+﻿using AutoMessage.Extensions;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
@@ -8,7 +11,7 @@ namespace AutoMessage
 {
     public static class MessageTypeDeserializer
     {
-        private const string DynamicAssemblyName = "AutoMessageDynamicDefinitions";
+        private const string DynamicAssemblyName = "SeedNet.Shared.SerializationDynamicDefinitions";
         private static Dictionary<string, Type> m_createdTypes = new Dictionary<string, Type>();
 
         private static int GetTypeDepth(MessageTypeNode messageTypeNode, int count = 0)
@@ -29,27 +32,62 @@ namespace AutoMessage
 
         private static Type GetTypeInAssembly(string name)
         {
-            var entryAssembly = Assembly.GetEntryAssembly();
-            List<Assembly> assemblies = new List<Assembly>() { entryAssembly };
-
-            foreach (var r in entryAssembly.GetReferencedAssemblies())
-            {
-                try
-                {
-                    assemblies.Add(Assembly.Load(r));
-                }
-                catch
-                {
-
-                }
-            }
-
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             foreach (var assembly in assemblies)
             {
+                var searchForGeneric = name.Contains("<") && name.Contains(">");
+                var arrayTokens = name.ContextAwareSplit("[]", '<', '>', false);
+                var arrayDepth = arrayTokens.Length - 1;
+                var baseName = arrayTokens.Length > 0 ? arrayTokens[0] : name;
+
+                Type foundType = null;
                 foreach (var type in assembly.GetTypes())
                 {
-                    if (type.FullName == name)
-                        return type;
+                    if (searchForGeneric && !type.IsGenericType || !searchForGeneric && type.IsGenericType)
+                        continue;
+
+                    if (type.IsGenericType)
+                    {
+                        var typeName = MessageTypeSerializer.GetTypeName(type);
+                        if (typeName.Split('<')[0] == baseName.Split('<')[0])
+                        {
+                            var genericArgumentsStartIndex = baseName.IndexOf('<');
+                            var genericArgumentsEndIndex = baseName.LastIndexOf('>');
+                            var genericArgumentString = baseName.Substring(genericArgumentsStartIndex + 1, genericArgumentsEndIndex - genericArgumentsStartIndex - 1);
+                            var genericArgumentStrings = genericArgumentString.ContextAwareSplit(",", '<', '>', true);
+                            var genericArguments = genericArgumentStrings.Select(ga => GetTypeInAssembly(ga)).ToArray();
+                            if (genericArguments.Contains(null))
+                                throw new Exception("Failed to find all generic argument types.");
+
+                            var genericInstantiatedType = type.MakeGenericType(genericArguments);
+                            foundType = genericInstantiatedType;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        var typeName = MessageTypeSerializer.GetTypeName(type);
+                        if (typeName == baseName)
+                        {
+                            foundType = type;
+                            break;
+                        }
+                    }
+                }
+
+                if (foundType != null)
+                {
+                    if (arrayDepth > 0)
+                    {
+                        var arrayType = foundType;
+
+                        for (var ad = 0; ad < arrayDepth; ad++)
+                            arrayType = foundType.MakeArrayType();
+
+                        return arrayType;
+                    }
+                    else
+                        return foundType;
                 }
             }
 

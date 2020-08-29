@@ -25,7 +25,7 @@ namespace AutoMessage
 
             lock (NodeSerializers)
             {
-                if (!NodeSerializers.TryGetValue(t.FullName, out serializer))
+                if (!NodeSerializers.TryGetValue(MessageTypeSerializer.GetTypeName(t), out serializer))
                     serializer = null;
             }
 
@@ -38,7 +38,7 @@ namespace AutoMessage
 
                 lock (NodeSerializers)
                 {
-                    if (!NodeSerializers.TryGetValue(t.FullName, out serializer))
+                    if (!NodeSerializers.TryGetValue(MessageTypeSerializer.GetTypeName(t), out serializer))
                         throw new Exception("Failed to create serializer.");
                 }
             }
@@ -52,7 +52,7 @@ namespace AutoMessage
 
             lock (NodeSizeCalculators)
             {
-                if (!NodeSizeCalculators.TryGetValue(t.FullName, out sizeCalculator))
+                if (!NodeSizeCalculators.TryGetValue(MessageTypeSerializer.GetTypeName(t), out sizeCalculator))
                     sizeCalculator = null;
             }
 
@@ -65,7 +65,7 @@ namespace AutoMessage
 
                 lock (NodeSizeCalculators)
                 {
-                    if (!NodeSizeCalculators.TryGetValue(t.FullName, out sizeCalculator))
+                    if (!NodeSizeCalculators.TryGetValue(MessageTypeSerializer.GetTypeName(t), out sizeCalculator))
                         throw new Exception("Failed to create serializer.");
                 }
             }
@@ -162,14 +162,6 @@ namespace AutoMessage
                 throw new Exception("Not a base type.");
         }
 
-        private static bool IsTypeArray(Type t)
-        {
-            if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>))
-                throw new Exception("Lists are not allowed at this point.");
-                
-            return t.IsArray;
-        }
-
         private static Expression CallNodeSerializer(string typeName, Expression writer, Expression value)
         {
             Expression<Action<BinaryWriter, object>> nodeSerializer;
@@ -254,7 +246,7 @@ namespace AutoMessage
                 string elementTypeName = typeName.Substring(0, typeName.Length - 2);
                 var elementType = MessageTypeDeserializer.GetType(elementTypeName);
 
-                if (MessageTypeSerializer.PrimitiveArrayTypes.Contains(type))
+                if (MessageTypeSerializer.PrimitiveArrayTypes.Contains(type) && !IsList(source))
                     return WritePrimitiveArray(type, writer, source);
                 else
                     return WriteArray(elementTypeName, elementType, writer, source);

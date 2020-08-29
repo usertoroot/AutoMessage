@@ -29,7 +29,7 @@ namespace AutoMessage
 
             lock (NodeDeserializers)
             {
-                if (!NodeDeserializers.TryGetValue(t.FullName, out deserializer))
+                if (!NodeDeserializers.TryGetValue(MessageTypeSerializer.GetTypeName(t), out deserializer))
                     deserializer = null;
             }
 
@@ -42,7 +42,7 @@ namespace AutoMessage
 
                 lock (NodeDeserializers)
                 {
-                    if (!NodeDeserializers.TryGetValue(t.FullName, out deserializer))
+                    if (!NodeDeserializers.TryGetValue(MessageTypeSerializer.GetTypeName(t), out deserializer))
                         throw new Exception("Failed to create deserializer.");
                 }
             }
@@ -100,8 +100,6 @@ namespace AutoMessage
                 return typeof(BinaryReader).GetMethod("ReadDouble");
             else if (t == typeof(bool))
                 return typeof(BinaryReader).GetMethod("ReadBoolean");
-            else if (t == typeof(decimal))
-                return typeof(BinaryReader).GetMethod("ReadDecimal");
             else if (t == typeof(sbyte[]))
                 return typeof(BinaryReader).GetMethod("ReadSBytes");
             else if (t == typeof(short[]))
@@ -126,8 +124,6 @@ namespace AutoMessage
                 return typeof(BinaryReader).GetMethod("ReadDoubles");
             else if (t == typeof(bool[]))
                 return typeof(BinaryReader).GetMethod("ReadBooleans");
-            else if (t == typeof(decimal[]))
-                return typeof(BinaryReader).GetMethod("ReadDecimals");
             else
                 throw new Exception("Not a base type.");
         }
@@ -204,7 +200,7 @@ namespace AutoMessage
                 string elementTypeName = typeName.Substring(0, typeName.Length - 2);
                 var elementType = MessageTypeDeserializer.GetType(elementTypeName);
 
-                if (MessageTypeSerializer.PrimitiveArrayTypes.Contains(type))
+                if (MessageTypeSerializer.PrimitiveArrayTypes.Contains(type) && !IsList(target))
                     return ReadPrimitiveArray(type, reader, target);
                 else
                     return ReadArray(elementTypeName, elementType, reader, target);

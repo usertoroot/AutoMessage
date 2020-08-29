@@ -26,7 +26,6 @@ namespace AutoMessage
         public void Write(long[] values) => WritePrimitiveArray(values);
         public void Write(int[] values) => WritePrimitiveArray(values);
         public void Write(short[] values) => WritePrimitiveArray(values);
-        public void Write(decimal[] values) => WritePrimitiveArray(values);
         public void Write(bool[] values) => WritePrimitiveArray(values);
         public void Write(double[] values) => WritePrimitiveArray(values);
 

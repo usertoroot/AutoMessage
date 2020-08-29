@@ -24,7 +24,7 @@ namespace AutoMessage
 
             MessageType messageType = new MessageType
             {
-                TypeName = t.FullName,
+                TypeName = GetTypeName(t),
                 Hash = CalculateHash(t.Name),
                 Types = typeList
             };
@@ -59,6 +59,25 @@ namespace AutoMessage
                 SerializedTypes[t] = messageType;
 
             return messageType;
+        }
+
+        public static string GetTypeName(Type t)
+        {
+            if (FinalTypes.Contains(t))
+                return t.Name;
+
+            if (t.IsArray)
+                return $"{GetTypeName(t.GetElementType())}[]";
+
+            if (t.IsGenericType)
+            {
+                var fullName = t.FullName.Split("`1")[0].Replace("+", ".");
+                var genericArguments = t.GetGenericArguments();
+                var genericArgumentString = string.Join(", ", genericArguments.Select(argumentType => GetTypeName(argumentType)).ToArray());
+                return $"{fullName}<{genericArgumentString}>";
+            }
+
+            return t.FullName;
         }
 
         private static bool IsTypeArray(Type t)
@@ -98,7 +117,7 @@ namespace AutoMessage
             else
                 elementType = type;
 
-            tn = FinalTypes.Contains(elementType) ? elementType.Name : elementType.FullName;
+            tn = GetTypeName(elementType);
 
             typeName = tn;
             return typeList.Any(t => t.TypeName == tn);
@@ -119,13 +138,10 @@ namespace AutoMessage
             }
             else
             {
-                if (type.IsGenericType)
-                    return null;
-
                 MessageTypeNode messageTypeNode = new MessageTypeNode()
                 {
                     Name = name,
-                    TypeName = type.FullName
+                    TypeName = GetTypeName(type)
                 };
 
                 if (FinalTypes.Contains(type))
@@ -136,9 +152,9 @@ namespace AutoMessage
 
                 var constructor = type.GetConstructor(Type.EmptyTypes);
                 if (constructor == null)
-                    return null;
+                    throw new Exception($"Type is missing a default constructor.");
 
-                int index = typeList.FindIndex(t => t.TypeName == type.FullName);
+                int index = typeList.FindIndex(t => t.TypeName == GetTypeName(type));
                 if (index < 0)
                 {
                     var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
@@ -146,7 +162,7 @@ namespace AutoMessage
 
                     MessageTypeNode newTypeNode = new MessageTypeNode()
                     {
-                        TypeName = type.FullName,
+                        TypeName = GetTypeName(type),
                         Children = new List<MessageTypeNode>(fields.Length + properties.Length)
                     };
 
@@ -159,7 +175,7 @@ namespace AutoMessage
                             throw new Exception($"Type '{field.FieldType}' of '{field.Name}' not serializable.");
 
                         if (IsDefinedType(field.FieldType, typeList, out string typeName))
-                            typeDependencies.Add((type.FullName, typeName));
+                            typeDependencies.Add((GetTypeName(type), typeName));
 
                         newTypeNode.Children.Add(tn);
                     }
@@ -171,7 +187,7 @@ namespace AutoMessage
                             throw new Exception($"Type '{property.PropertyType}' of '{property.Name}' not serializable.");
 
                         if (IsDefinedType(property.PropertyType, typeList, out string typeName))
-                            typeDependencies.Add((type.FullName, typeName));
+                            typeDependencies.Add((GetTypeName(type), typeName));
 
                         newTypeNode.Children.Add(tn);
                     }
