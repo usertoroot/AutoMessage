@@ -13,8 +13,9 @@
     <RepositoryUrl>https://github.com/usertoroot/AutoMessage</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <PackageTags>utility serializer serialization deserializer deserialization binary parser reader writer emit expression netstandard standard</PackageTags>
-    <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added support for generic types and added integration tests.</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -31,11 +32,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="automessage.jpg">
+    <None Include="..\LICENSE">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
-    <None Include="LICENSE">
+    <None Include="automessage.jpg">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
